@@ -1,0 +1,18 @@
+# Git
+.git
+
+# VS Code
+.vscode
+
+# Python
+.venv
+.tox
+__pycache__
+.mypy_cache
+*.pyc
+build
+home_manger.egg-info
+
+# Other
+tmp
+tox_files
