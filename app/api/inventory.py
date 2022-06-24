@@ -1,7 +1,9 @@
 from fastapi import APIRouter
+from typing import Dict
 
 from app.db.crud import CRUD
-from app.db.schemas.item import Item, ItemInDB
+from app.db.schemas.item import Item, ItemInDB, ItemAvailability
+
 
 recipe_router = APIRouter(prefix="/inventory")
 crud = CRUD(
@@ -54,3 +56,37 @@ async def delete_by_name(
         }
     )
     await delete(data[0].id)
+
+
+@recipe_router.post("/check", response_model=list[ItemAvailability])
+async def post(items: list[Item]) -> list[ItemAvailability]:
+    should_statements = []
+    required_items: Dict[str, ItemAvailability] = {}
+    for item in items:
+        if item.name not in required_items:
+            required_items[item.name] = ItemAvailability(
+                name=item.name,
+                amount=0,
+                unit=item.unit,
+                available=False,
+            )
+        
+        required_items[item.name].amount += item.amount
+        should_statements.append(
+            {"term" : { "name" : item.name }}
+        )
+
+    query = {
+        "bool" : {
+            "should" : should_statements,
+            "minimum_should_match" : 1
+        }
+    }
+    available_items = await crud.read(query=query)
+    for item in available_items:
+        required_item = required_items.get(item.name)
+        if item.amount >= required_item.amount:
+            required_item.available = True
+
+
+    return list(required_items.values())
