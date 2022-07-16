@@ -1,13 +1,27 @@
-from codecs import ignore_errors
-
-from elasticsearch import AsyncElasticsearch
+from elasticsearch import AsyncElasticsearch, exceptions
+from asyncio import sleep
 
 from app.consts import ELASTIC_AUTH_CONFIG
+from app.logger import main_logger
+
 
 elastic = AsyncElasticsearch(**ELASTIC_AUTH_CONFIG)
 
 
+async def _wait_for_es() -> None:
+    while True:
+        try:
+            info = await elastic.info()
+            main_logger.info(info)
+            return
+        except exceptions.ConnectionError:
+            hosts = ELASTIC_AUTH_CONFIG.get("hosts")
+            main_logger.warning(f"Waiting for: {hosts}")
+            await sleep(5)
+
+
 async def initialize() -> None:
+    await _wait_for_es()
     await elastic.ilm.put_lifecycle(
         name="lt-40GB",
         policy={

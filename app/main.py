@@ -12,7 +12,7 @@ app = FastAPI(
     docs_url="/api/docs",
     openapi_url="/api",
 )
-# app.add_middleware(ElasticAPM, make_apm_client(ELASTIC_APM_CONFIG))
+app.add_middleware(ElasticAPM, client=make_apm_client(ELASTIC_APM_CONFIG))
 
 
 @app.on_event("startup")

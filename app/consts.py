@@ -1,6 +1,5 @@
 import os
 
-from elasticsearch import AsyncElasticsearch
 
 # APP
 SERVICE_NAME = "inventory"
@@ -15,9 +14,9 @@ ELASTIC_AUTH_CONFIG = {
 }
 
 # Elastic APM
-ELASTIC_APM_HOST = "http://"
-ELASTIC_APM_PORT = 8200
 ELASTIC_APM_CONFIG = {
     "SERVICE_NAME": SERVICE_NAME,
-    "SERVER_URL": f"{ELASTIC_APM_HOST}:{ELASTIC_APM_PORT}",
+    "SERVER_URL": os.environ.get("ELASTIC_APM_HOST"),
+    "SECRET_TOKEN": os.environ.get("ELASTIC_APM_SECRET_TOKEN"),
+    "VERIFY_SERVER_CERT": os.environ.get("ELASTIC_APM_VERIFY_SERVER_CERT", False),
 }

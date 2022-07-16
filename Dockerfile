@@ -1,13 +1,9 @@
 FROM python:3.10-slim as base
-RUN pip install tox
+WORKDIR /project
+COPY ./requirements.txt /project/requirements.txt
+RUN pip install --no-cache-dir -r /project/requirements.txt
+COPY ./app /project/app
 
-FROM base as build
-COPY . /inventory
-WORKDIR /inventory
-RUN tox -e mypy,build
-
-FROM python:3.10-slim
-COPY --from=base /inventory/tox_files/dist/* /opt/
-RUN pip install /opt/*.whl
-EXPOSE 5000
-ENTRYPOINT inventory
+FROM base as production
+ENTRYPOINT ["uvicorn", "app.main:app"]
+CMD ["--host", "0.0.0.0", "--port", "80"]
