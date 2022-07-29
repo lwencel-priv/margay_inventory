@@ -51,7 +51,7 @@ async def initialize() -> None:
                     "name": {"type": "keyword"},
                     "amount": {"type": "double"},
                     "unit": {"type": "keyword"},
-                    "type": {"type": "keyword"},
+                    "target_amount": {"type": "double"},
                 },
             },
         },

@@ -1,10 +1,14 @@
 from pydantic import BaseModel
 
 
-class Item(BaseModel):
+class BaseItem(BaseModel):
     name: str
-    amount: int
+
+
+class Item(BaseItem):
+    amount: float
     unit: str
+    target_amount: float
 
 
 class ItemInDB(Item):

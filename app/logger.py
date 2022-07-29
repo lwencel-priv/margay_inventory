@@ -1,6 +1,7 @@
 """Main logger."""
 
 import logging
+from elasticapm.handlers.logging import Formatter
 
 # create logger
 main_logger = logging.getLogger("MAIN")
@@ -11,7 +12,7 @@ stream_handler = logging.StreamHandler()
 stream_handler.setLevel(logging.DEBUG)
 
 # create formatter
-formatter = logging.Formatter("[%(asctime)s][%(name)s][%(levelname)s]: %(message)s")
+formatter = Formatter("[%(asctime)s][%(name)s][%(levelname)s]: %(message)s")
 
 # add formatter to ch
 stream_handler.setFormatter(formatter)

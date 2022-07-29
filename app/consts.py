@@ -6,6 +6,13 @@ SERVICE_NAME = "inventory"
 SERVICE_HOST = "0.0.0.0"
 SERVICE_PORT = 5001
 
+CORS = {
+    "allow_origins": ["*"],
+    "allow_credentials": True,
+    "allow_methods": ["*"],
+    "allow_headers": ["*"],
+}
+
 # ElasticSearch
 ELASTIC_AUTH_CONFIG = {
     "hosts": os.environ.get("ELASTIC_HOSTS", "https://es01:9200").split(","),

@@ -5,7 +5,7 @@ from app.db.crud import CRUD
 from app.db.schemas.item import Item, ItemInDB, ItemAvailability
 
 
-recipe_router = APIRouter(prefix="/inventory")
+inventory_router = APIRouter(prefix="/inventory")
 crud = CRUD(
     es_index="inventory",
     create_schema=Item,
@@ -13,7 +13,7 @@ crud = CRUD(
 )
 
 
-@recipe_router.get("/", response_model=list[ItemInDB])
+@inventory_router.get("/", response_model=list[ItemInDB])
 async def get(
     offset: int = 0,
     limit: int = 1,
@@ -21,17 +21,17 @@ async def get(
     return await crud.read(query={"match_all": {}})
 
 
-@recipe_router.post("/", response_model=ItemInDB)
+@inventory_router.post("/", response_model=ItemInDB)
 async def post(recipe: Item) -> ItemInDB:
     return await crud.create(recipe)
 
 
-@recipe_router.delete("/")
+@inventory_router.delete("/")
 async def delete(doc_id: str) -> None:
     await crud.delete(doc_id)
 
 
-@recipe_router.get("/{name}", response_model=list[ItemInDB])
+@inventory_router.get("/{name}", response_model=list[ItemInDB])
 async def get_by_name(
     name: str,
 ) -> list[ItemInDB]:
@@ -44,7 +44,7 @@ async def get_by_name(
     )
 
 
-@recipe_router.delete("/{name}")
+@inventory_router.delete("/{name}")
 async def delete_by_name(
     name: str,
 ) -> None:
@@ -58,8 +58,8 @@ async def delete_by_name(
     await delete(data[0].id)
 
 
-@recipe_router.post("/check", response_model=list[ItemAvailability])
-async def post(items: list[Item]) -> list[ItemAvailability]:
+@inventory_router.post("/check", response_model=list[ItemAvailability])
+async def check(items: list[Item]) -> list[ItemAvailability]:
     should_statements = []
     required_items: Dict[str, ItemAvailability] = {}
     for item in items:
@@ -67,6 +67,7 @@ async def post(items: list[Item]) -> list[ItemAvailability]:
             required_items[item.name] = ItemAvailability(
                 name=item.name,
                 amount=0,
+                target_amount=0,
                 unit=item.unit,
                 available=False,
             )
