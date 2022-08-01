@@ -18,13 +18,19 @@ async def get(
     offset: int = 0,
     limit: int = 1,
 ) -> list[ItemInDB]:
-    return await crud.read(query={"match_all": {}})
+    return await crud.read(
+        size=limit,
+        query={"match_all": {}}
+    )
 
 
 @inventory_router.post("/", response_model=ItemInDB)
 async def post(recipe: Item) -> ItemInDB:
     return await crud.create(recipe)
 
+@inventory_router.patch("/", response_model=ItemInDB)
+async def patch(recipe: ItemInDB) -> ItemInDB:
+    return await crud.update(recipe)
 
 @inventory_router.delete("/")
 async def delete(doc_id: str) -> None:

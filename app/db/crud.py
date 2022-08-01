@@ -1,5 +1,5 @@
 import uuid
-from typing import Type
+from typing import Type, Optional
 
 from app.db.db import elastic
 from app.db.schemas import CreateSchemaType, ResponseSchemaType
@@ -24,9 +24,11 @@ class CRUD:
         doc["id"] = doc_id
         return self._response_schema(**doc)
 
-    async def read(self, query: dict) -> list[ResponseSchemaType]:
+    async def read(self, query: dict, size: Optional[int] = None, from_: Optional[int] = None) -> list[ResponseSchemaType]:
         response = await elastic.search(
             index=self._es_index,
+            size=size,
+            from_=from_,
             query=query,
         )
         items = []
@@ -40,8 +42,16 @@ class CRUD:
 
         return items
 
-    async def update(self) -> None:
-        pass
+    async def update(self, recipe: ResponseSchemaType) -> None:
+        doc = recipe.dict()
+        doc_id = doc.get("id")
+        del doc["id"]
+        await elastic.update(
+            index=self._es_index,
+            id=doc_id,
+            doc=doc,
+        )
+        return recipe
 
     async def delete(self, doc_id: str) -> None:
         await elastic.delete(
