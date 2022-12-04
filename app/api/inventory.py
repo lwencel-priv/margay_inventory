@@ -3,9 +3,8 @@ from typing import Dict
 
 from app.db.crud import CRUD
 from app.db.schemas.item import Item, ItemInDB, ItemAvailability
+from . import router_v1
 
-
-inventory_router = APIRouter(prefix="/inventory")
 crud = CRUD(
     es_index="inventory",
     create_schema=Item,
@@ -13,7 +12,7 @@ crud = CRUD(
 )
 
 
-@inventory_router.get("/", response_model=list[ItemInDB])
+@router_v1.get("/", response_model=list[ItemInDB])
 async def get(
     offset: int = 0,
     limit: int = 1,
@@ -24,20 +23,20 @@ async def get(
     )
 
 
-@inventory_router.post("/", response_model=ItemInDB)
+@router_v1.post("/", response_model=ItemInDB)
 async def post(recipe: Item) -> ItemInDB:
     return await crud.create(recipe)
 
-@inventory_router.patch("/", response_model=ItemInDB)
+@router_v1.patch("/", response_model=ItemInDB)
 async def patch(recipe: ItemInDB) -> ItemInDB:
     return await crud.update(recipe)
 
-@inventory_router.delete("/")
+@router_v1.delete("/")
 async def delete(doc_id: str) -> None:
     await crud.delete(doc_id)
 
 
-@inventory_router.get("/{name}", response_model=list[ItemInDB])
+@router_v1.get("/{name}", response_model=list[ItemInDB])
 async def get_by_name(
     name: str,
 ) -> list[ItemInDB]:
@@ -50,7 +49,7 @@ async def get_by_name(
     )
 
 
-@inventory_router.delete("/{name}")
+@router_v1.delete("/{name}")
 async def delete_by_name(
     name: str,
 ) -> None:
@@ -64,7 +63,7 @@ async def delete_by_name(
     await delete(data[0].id)
 
 
-@inventory_router.post("/check", response_model=list[ItemAvailability])
+@router_v1.post("/check", response_model=list[ItemAvailability])
 async def check(items: list[Item]) -> list[ItemAvailability]:
     should_statements = []
     required_items: Dict[str, ItemAvailability] = {}
